@@ -35,7 +35,7 @@ jobs:
 
       - name: Publish unit test report
         if: always()
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         with:
           check_name: Unit tests
           report_paths: target/surefire-reports/TEST-*.xml
@@ -104,7 +104,7 @@ jobs:
 
       - name: Publish SoapUI test report
         if: always()
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         with:
           check_name: SoapUI API tests
           report_paths: reports/soapui/**/*.xml
