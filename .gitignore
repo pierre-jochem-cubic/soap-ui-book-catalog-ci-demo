@@ -1,0 +1,10 @@
+target/
+reports/
+*.log
+.idea/
+*.iml
+.vscode/
+.DS_Store
+# SoapUI writes these next to the project when run locally
+soapui-errors.log
+global-groovy.log

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: book-catalog
+  mvc:
+    problemdetails:
+      # Validation errors etc. are returned as application/problem+json
+      enabled: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

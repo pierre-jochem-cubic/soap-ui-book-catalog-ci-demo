@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project xmlns:con="http://eviware.com/soapui/config" id="ef82a587-153a-57ed-8544-768c2cb5ce76" activeEnvironment="Default" name="Book Catalog" resourceRoot="" soapui-version="5.9.1" abortOnError="false" runType="SEQUENTIAL">
+  <con:settings/>
+  <con:interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="con:RestService" id="d254d5b1-f7d3-5a5b-91c4-166ebeb38444" wadlVersion="http://wadl.dev.java.net/2009/02" name="Book Catalog API" type="rest" basePath="">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Project#baseUrl}</con:endpoint>
+    </con:endpoints>
+    <con:resource name="Books" path="/api/books" id="bd095fd0-2a03-519f-9d80-6d2f92cd94cd">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="List books" id="839e03ee-22b9-5a5c-bb3c-fe27583da3d3" method="GET">
+        <con:settings/>
+        <con:parameters/>
+      </con:method>
+      <con:method name="Create book" id="30960925-6a75-5bfc-ac4a-95114744ff03" method="POST">
+        <con:settings/>
+        <con:parameters/>
+      </con:method>
+    </con:resource>
+    <con:resource name="Book by id" path="/api/books/{id}" id="0d126d7d-fa14-5af4-a830-64549a72f14c">
+      <con:settings/>
+      <con:parameters>
+        <con:parameter required="true">
+          <con:name>id</con:name>
+          <con:value/>
+          <con:style>TEMPLATE</con:style>
+          <con:default/>
+        </con:parameter>
+      </con:parameters>
+      <con:method name="Get book" id="7a52ee9b-81ee-5a5e-9ef6-8a0ee483be69" method="GET">
+        <con:settings/>
+        <con:parameters/>
+      </con:method>
+      <con:method name="Update book" id="83689a84-5dda-53d1-93a9-243ef353d0ce" method="PUT">
+        <con:settings/>
+        <con:parameters/>
+      </con:method>
+      <con:method name="Delete book" id="5c07db3b-a7bf-58e5-9e8c-ce9c6c902041" method="DELETE">
+        <con:settings/>
+        <con:parameters/>
+      </con:method>
+    </con:resource>
+    <con:resource name="Health" path="/actuator/health" id="315acf34-3601-54e9-bc38-c7b95a7da1b4">
+      <con:settings/>
+      <con:parameters/>
+      <con:method name="Get health" id="a65a2e16-f21b-5e1b-bcea-6ccf1410b54b" method="GET">
+        <con:settings/>
+        <con:parameters/>
+      </con:method>
+    </con:resource>
+  </con:interface>
+  <con:testSuite id="2136f2ae-073b-5d11-ae1b-caf80e03e04d" name="Book API">
+    <con:description>End-to-end tests for the Book Catalog REST API.</con:description>
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase id="9b54ba1a-927b-50b0-ba68-42dbff78c07e" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Health check" searchProperties="true">
+      <con:description>Smoke test: the application is up and reports status UP.</con:description>
+      <con:settings/>
+      <con:testStep type="restrequest" name="GET health" id="4a7830d0-ffb0-5012-bef4-72b2b2cca70c">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/actuator/health" methodName="Get health" xsi:type="con:RestRequestStep">
+          <con:restRequest name="GET health" id="a4cec8b8-eddd-5f12-9464-7898e4bed3e0" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="253d8681-257a-5906-801d-f6267e25aba7" name="HTTP status 200">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="97809f8f-7dae-586f-8e7a-c37c2b0c91b9" name="Status is UP">
+              <con:configuration>
+                <path>$.status</path>
+                <content>UP</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Response SLA Assertion" id="97dd374d-90a4-52fd-82a5-bfc88d6205a7" name="Response SLA">
+              <con:configuration>
+                <SLA>2000</SLA>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase id="d8107940-b385-568d-bd86-411f878659d3" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Book lifecycle" searchProperties="true">
+      <con:description>Creates a book, reads it back, updates it, lists it, deletes it and verifies it is gone. The generated id is passed between steps via a property transfer into the TestCase property 'bookId'.</con:description>
+      <con:settings/>
+      <con:testStep type="restrequest" name="Create book" id="b7406639-e9b0-5b40-81a1-3ffcb5f87056">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books" methodName="Create book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Create book" id="c7599bd3-8b19-59d1-b5ed-e876ec8a0387" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request><![CDATA[{
+  "title": "${#TestCase#title}",
+  "author": "Ursula K. Le Guin",
+  "isbn": "9780441478125",
+  "publishedYear": 1969
+}]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" id="ab22091c-4b4b-50c6-b975-4c16950586ef" name="HTTP status 201">
+              <con:configuration>
+                <codes>201</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="30595f38-4dd0-5494-b805-084301d6de69" name="Title echoed">
+              <con:configuration>
+                <path>$.title</path>
+                <content>${#TestCase#title}</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="cf3fec1e-b49e-55d9-933f-7119a7b2a08b" name="Year echoed">
+              <con:configuration>
+                <path>$.publishedYear</path>
+                <content>1969</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="transfer" name="Transfer book id" id="a186c23a-cff9-5b4c-af99-0b40da5c851a">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="con:PropertyTransfersStep">
+          <con:transfers setNullOnMissingSource="false" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false">
+            <con:name>bookId</con:name>
+            <con:sourceType>Response</con:sourceType>
+            <con:sourceStep>Create book</con:sourceStep>
+            <con:sourcePath>$.id</con:sourcePath>
+            <con:targetType>bookId</con:targetType>
+            <con:targetStep>#TestCase#</con:targetStep>
+            <con:targetPath/>
+            <con:type>JSONPATH</con:type>
+            <con:upgraded>true</con:upgraded>
+          </con:transfers>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Get created book" id="f662e076-21c4-502c-b714-34057cd15de9">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books/{id}" methodName="Get book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Get created book" id="4029c859-12c5-55a9-a00a-4debbf9b9362" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="1de31560-b34c-52bc-82d8-565d919a5504" name="HTTP status 200">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="38e0c457-f7ae-53a8-af2f-b7c8dc2e1bd6" name="Id matches">
+              <con:configuration>
+                <path>$.id</path>
+                <content>${#TestCase#bookId}</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="45869d55-f3a0-5258-9019-fab4b84275de" name="Author matches">
+              <con:configuration>
+                <path>$.author</path>
+                <content>Ursula K. Le Guin</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <con:entry key="id" value="${#TestCase#bookId}"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Update book" id="443d6989-33e2-591f-9ca6-48ed611e8090">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books/{id}" methodName="Update book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Update book" id="c5cc6a2c-a2ed-57e7-aadc-3e3837012d9c" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request><![CDATA[{
+  "title": "${#TestCase#title} (Anniversary Edition)",
+  "author": "Ursula K. Le Guin",
+  "isbn": "9780441478125",
+  "publishedYear": 2019
+}]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" id="2645e28f-dbdf-5888-a770-85097f8f5b38" name="HTTP status 200">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="bf3b12ef-f6f6-5863-a3b5-97033c177f3c" name="Year updated">
+              <con:configuration>
+                <path>$.publishedYear</path>
+                <content>2019</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Simple Contains" id="413925e7-ef60-56e2-ac8a-d36de55c8318" name="Title updated">
+              <con:configuration>
+                <token>Anniversary Edition</token>
+                <ignoreCase>false</ignoreCase>
+                <useRegEx>false</useRegEx>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <con:entry key="id" value="${#TestCase#bookId}"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="List books" id="eeb7a831-e1e5-50fe-aaa9-a6d1006570c1">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books" methodName="List books" xsi:type="con:RestRequestStep">
+          <con:restRequest name="List books" id="c4415635-2da5-5eb5-ad49-cd928fba40c3" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="32499926-2687-549c-a58c-879e80bea384" name="HTTP status 200">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="GroovyScriptAssertion" id="385a8ed0-93df-5d9c-bc39-07359257923b" name="List contains created book">
+              <con:configuration>
+                <scriptText>import groovy.json.JsonSlurper
+
+// Script assertions are handy when a check doesn't fit a single JsonPath expression
+def books = new JsonSlurper().parseText(messageExchange.responseContent)
+def id = context.expand('${#TestCase#bookId}') as long
+
+assert books instanceof List
+assert books.any { it.id == id } : "Created book $id not found in list"
+</scriptText>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Delete book" id="a97f0fea-a47f-591f-8872-a03c9160b791">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books/{id}" methodName="Delete book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Delete book" id="6ae098d2-5fe3-54e4-bbf0-b146325181cc" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="ad0aa4de-3f0d-54c2-95df-29e324b13228" name="HTTP status 204">
+              <con:configuration>
+                <codes>204</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <con:entry key="id" value="${#TestCase#bookId}"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Get deleted book" id="2df3cc36-6b70-5165-b8d4-f833864ebc84">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books/{id}" methodName="Get book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Get deleted book" id="3b30a333-ea2d-5ce8-8668-7b0a7ddd338a" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="cb5c3e99-dd85-58e2-a359-af53dc8b8e7e" name="HTTP status 404">
+              <con:configuration>
+                <codes>404</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <con:entry key="id" value="${#TestCase#bookId}"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties>
+        <con:property>
+          <con:name>bookId</con:name>
+          <con:value/>
+        </con:property>
+        <con:property>
+          <con:name>title</con:name>
+          <con:value>The Left Hand of Darkness</con:value>
+        </con:property>
+      </con:properties>
+    </con:testCase>
+    <con:testCase id="38f866f8-6765-5b3b-ac43-c87f8fa06c83" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Error handling" searchProperties="true">
+      <con:description>Negative tests: validation errors return 400 and unknown ids return 404, both as problem+json.</con:description>
+      <con:settings/>
+      <con:testStep type="restrequest" name="Create invalid book" id="a379a43a-a1c4-5f1c-b1c1-2dd32168fe6b">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books" methodName="Create book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Create invalid book" id="eeddf384-e11e-56b0-bbef-5271fdc117a1" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request><![CDATA[{
+  "title": "",
+  "author": "Nobody",
+  "isbn": "not-an-isbn",
+  "publishedYear": 3000
+}]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" id="fc238acb-a129-5afd-b18f-852f99f7a3fa" name="HTTP status 400">
+              <con:configuration>
+                <codes>400</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="27a99fa1-29c7-5097-b919-a0f9210caa93" name="Problem status 400">
+              <con:configuration>
+                <path>$.status</path>
+                <content>400</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters/>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Get unknown book" id="b1591f8f-0d13-5ef7-8eba-293ec838c883">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books/{id}" methodName="Get book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Get unknown book" id="9741f312-b184-57c1-b267-f0ee1c694815" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="729b2e2f-1682-5ca5-b414-84d6310351bc" name="HTTP status 404">
+              <con:configuration>
+                <codes>404</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="JsonPath Match" id="72bbb641-ae8f-5c06-9b7e-1f30165283db" name="Problem status 404">
+              <con:configuration>
+                <path>$.status</path>
+                <content>404</content>
+                <allowWildcards>false</allowWildcards>
+                <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+                <ignoreComments>false</ignoreComments>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="Simple Contains" id="773e94cd-d4b3-5082-b86d-8f4adbd273e8" name="Detail mentions id">
+              <con:configuration>
+                <token>999999</token>
+                <ignoreCase>false</ignoreCase>
+                <useRegEx>false</useRegEx>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <con:entry key="id" value="999999"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:testStep type="restrequest" name="Delete unknown book" id="89f3e4c0-20ad-5aeb-8ded-13071e43d9aa">
+        <con:settings/>
+        <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Book Catalog API" resourcePath="/api/books/{id}" methodName="Delete book" xsi:type="con:RestRequestStep">
+          <con:restRequest name="Delete unknown book" id="1b98ffd7-4d08-5fb8-ba55-f2e62031ede6" mediaType="application/json" postQueryString="false">
+            <con:settings>
+              <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/&gt;</con:setting>
+            </con:settings>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Project#baseUrl}</con:endpoint>
+            <con:request/>
+            <con:assertion type="Valid HTTP Status Codes" id="7efcba2a-049b-5eb1-9d73-eec6d64525f6" name="HTTP status 404">
+              <con:configuration>
+                <codes>404</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <con:entry key="id" value="999999"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:properties/>
+  </con:testSuite>
+  <con:properties>
+    <con:property>
+      <con:name>baseUrl</con:name>
+      <con:value>http://localhost:8080</con:value>
+    </con:property>
+  </con:properties>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+  <con:oAuth1ProfileContainer/>
+</con:soapui-project>
