@@ -79,7 +79,7 @@ jobs:
 
       - name: Cache SoapUI
         id: cache-soapui
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/soapui
           key: soapui-${{ env.SOAPUI_VERSION }}
